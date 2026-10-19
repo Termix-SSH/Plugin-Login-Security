@@ -1,76 +1,66 @@
-import type { Request, Response, Router } from "express";
-import { desc, eq } from "drizzle-orm";
-import type { BetterSQLite3Database } from "drizzle-orm/better-sqlite3";
+import type { Router } from "express";
 import type { PluginContext } from "@termix-ssh/plugin-sdk/backend";
-
-// The table object ctx.db.define hands back. Drizzle's own types are
-// per dialect, so the routes treat it loosely.
-type NotesTable = any;
+import type { LoginSecuritySettings } from "./policy.js";
 
 export function registerRoutes(
   router: Router,
   ctx: PluginContext,
-  notesTable: NotesTable,
+  settings: () => LoginSecuritySettings,
 ): void {
-  router.use(ctx.rbac.require("use") as never);
-
-  const client = () => ctx.db.client<BetterSQLite3Database>();
-  const actor = () => ctx.currentActor() as string;
-
   /**
    * @openapi
-   * /plugin-api/hello-world/notes:
+   * /policy:
    *   get:
-   *     summary: List the signed-in user's notes and the admin greeting
+   *     summary: Idle timeout for the signed in user
+   *     description: The idle timeout in minutes, 0 when off. The app uses it to sign out after a time without activity.
    *     tags:
-   *       - Hello World
+   *       - Login Security
    *     responses:
    *       200:
-   *         description: The greeting and the notes, newest first
+   *         description: The idle timeout.
    */
-  router.get("/notes", async (_req: Request, res: Response) => {
-    const db = await client();
-    const rows = await db
-      .select()
-      .from(notesTable)
-      .where(eq(notesTable.userId, actor()))
-      .orderBy(desc(notesTable.id));
-    const greeting = (await ctx.settings.get<string>("greeting")) ?? "Hello";
-    res.json({ greeting, notes: rows });
+  router.get("/policy", (_req, res) => {
+    res.json({ idleTimeoutMinutes: settings().idleTimeoutMinutes });
   });
 
   /**
    * @openapi
-   * /plugin-api/hello-world/notes:
+   * /activity:
    *   post:
-   *     summary: Add a note for the signed-in user
+   *     summary: Mark the session as active
+   *     description: Sent while someone works in a terminal or another view that makes no other requests, so the server does not end the session as idle.
    *     tags:
-   *       - Hello World
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               text:
-   *                 type: string
+   *       - Login Security
    *     responses:
-   *       201:
-   *         description: Note added
-   *       400:
-   *         description: Missing or empty text
+   *       204:
+   *         description: Recorded.
    */
-  router.post("/notes", async (req: Request, res: Response) => {
-    const text = typeof req.body?.text === "string" ? req.body.text.trim() : "";
-    if (!text || text.length > 1000) {
-      return res.status(400).json({ error: "text is required" });
-    }
-    const db = await client();
-    // No returning(): MySQL does not support it.
-    await db.insert(notesTable).values({ userId: actor(), text });
-    // SQLite only reaches disk when asked.
-    await ctx.db.persist();
-    res.status(201).json({ success: true });
+  router.post("/activity", (_req, res) => {
+    res.status(204).end();
   });
+
+  /**
+   * @openapi
+   * /status:
+   *   get:
+   *     summary: Second factors available
+   *     description: Admin only. The second factors installed plugins provide, so the settings page can warn when a second factor is required but none is installed.
+   *     tags:
+   *       - Login Security
+   *     responses:
+   *       200:
+   *         description: The second factors.
+   *       403:
+   *         description: Not an admin.
+   */
+  router.get(
+    "/status",
+    ctx.rbac.require("admin.plugins.manage") as never,
+    (_req, res) => {
+      res.json({
+        factors: ctx.auth.listSecondFactors(),
+        secondFactor: settings().secondFactor,
+      });
+    },
+  );
 }

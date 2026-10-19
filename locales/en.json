@@ -1,27 +1,45 @@
 {
-  "plugin": {
-    "name": "Hello World",
-    "description": "A minimal Termix plugin: one tab, one route, one setting and one table."
-  },
-  "tab": {
-    "title": "Hello World",
-    "empty": "No notes yet.",
-    "placeholder": "Write a note",
-    "add": "Add",
-    "error": "Could not load or save notes."
-  },
-  "permissions": {
-    "use": {
-      "title": "Use Hello World",
-      "description": "Open the Hello World tab and keep notes in it."
-    }
-  },
+  "name": "Login Security",
   "settings": {
+    "group": {
+      "sessions": "Sessions",
+      "secondFactor": "Second factor"
+    },
     "admin": {
-      "greeting": {
-        "label": "Greeting",
-        "description": "Shown at the top of the Hello World tab."
+      "idleTimeoutMinutes": {
+        "label": "Sign out after idle minutes",
+        "description": "Sign people out after this many minutes without activity. The server ends the session too, so a copied token stops working. 0 turns it off."
+      },
+      "maxSessionHours": {
+        "label": "Longest session in hours",
+        "description": "Sessions end after this many hours, even with remember me. 0 means no extra limit."
+      },
+      "rememberDevice": {
+        "label": "Allow remember me",
+        "description": "Off hides remember me at login and ignores devices remembered before, so every login asks for the second factor."
+      },
+      "secondFactor": {
+        "label": "Require a second factor",
+        "description": "People without one must set one up after they sign in, before they can use Termix. A passkey sign in with a PIN or fingerprint counts.",
+        "off": "Off",
+        "newDevice": "On a new device",
+        "always": "At every login"
+      },
+      "applyToExternal": {
+        "label": "Also for single sign-on",
+        "description": "Ask for the second factor after SSO and LDAP logins too. Leave it off when your identity provider already asks for one."
       }
     }
+  },
+  "status": {
+    "factors": "Second factors people can use: {{factors}}",
+    "noFactors": "No second factor is installed. Install a plugin like TOTP or WebAuthn so people can set one up.",
+    "failed": "Could not check which second factors are installed."
+  },
+  "setup": {
+    "title": "Set up a second factor",
+    "body": "Your admin requires a second factor to sign in. Set one up below to keep using Termix.",
+    "none": "Nothing to set up here? Ask your admin to install a second factor plugin.",
+    "signOut": "Sign out"
   }
 }
