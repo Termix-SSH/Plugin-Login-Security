@@ -53,14 +53,10 @@ export function registerRoutes(
    *       403:
    *         description: Not an admin.
    */
-  router.get(
-    "/status",
-    ctx.rbac.require("admin.plugins.manage") as never,
-    (_req, res) => {
-      res.json({
-        factors: ctx.auth.listSecondFactors(),
-        secondFactor: settings().secondFactor,
-      });
-    },
-  );
+  router.get("/status", ctx.rbac.require("manage") as never, (_req, res) => {
+    res.json({
+      factors: ctx.auth.listSecondFactors(),
+      secondFactor: settings().secondFactor,
+    });
+  });
 }

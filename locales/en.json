@@ -1,5 +1,11 @@
 {
   "name": "Login Security",
+  "permissions": {
+    "manage": {
+      "title": "Manage login security",
+      "description": "See the second factor status and change login security settings."
+    }
+  },
   "settings": {
     "group": {
       "sessions": "Sessions",

@@ -26,6 +26,14 @@
   },
   "capabilities": ["auth:policy", "network:serve", "ui:surface"],
   "contributes": {
+    "permissions": [
+      {
+        "name": "manage",
+        "titleKey": "permissions.manage.title",
+        "descriptionKey": "permissions.manage.description",
+        "defaultRoles": ["admin"]
+      }
+    ],
     "settings": {
       "admin": [
         {
