@@ -6,6 +6,12 @@
 
 <p>Sign people out when idle, limit session length, turn off remember me and require a second factor at login</p>
 
+<!-- VIDEO:START -->
+
+<a href="https://www.youtube.com/watch?v=mbgMJximcrs"><img src="https://img.shields.io/badge/Watch_the_demo-f59145?style=for-the-badge&logo=youtube&logoColor=white" alt="Watch the demo on YouTube" /></a>
+
+<!-- VIDEO:END -->
+
 </div>
 
 <br />
