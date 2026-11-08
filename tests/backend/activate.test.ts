@@ -67,6 +67,32 @@ describe("login security", () => {
     expect(policy.allowRememberDevice?.()).toBe(true);
   });
 
+  it("asks for a second factor on marked hosts only", async () => {
+    let check: ((input: never) => Promise<unknown>) | null = null;
+    const fake = createFakeContext({
+      pluginId: manifest.id,
+      settings: { connectFactor: "marked" },
+      router: () => express.Router(),
+    });
+    fake.ctx.hosts.connectPolicy.provide = ((provider: { check: never }) => {
+      check = provider.check;
+      return () => {};
+    }) as never;
+    const marked: Record<number, boolean> = { 7: true };
+    fake.ctx.settings.getHost = (async (hostId: number) =>
+      marked[hostId]) as never;
+    await activate(fake.ctx);
+
+    const ask = (hostId: number) =>
+      check!({ hostId, interactive: true, stepUpAt: null } as never);
+    expect(await ask(7)).toMatchObject({
+      decision: "request",
+      requestTab: "connect-verify",
+      requestKind: "verify",
+    });
+    expect(await ask(8)).toEqual({ decision: "allow" });
+  });
+
   it("needs auth:policy", async () => {
     const mock = createMockCtx({
       pluginId: manifest.id,

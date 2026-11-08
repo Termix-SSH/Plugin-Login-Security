@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   DEFAULT_SETTINGS,
+  connectFactorApplies,
   decide,
   readSettings,
 } from "../../src/backend/policy";
@@ -36,7 +37,54 @@ describe("readSettings", () => {
       rememberDevice: false,
       secondFactor: "new-device",
       applyToExternal: true,
+      connectFactor: "off",
+      connectFactorMinutes: 60,
     });
+  });
+
+  it("keeps the connect rule and falls back on odd values", () => {
+    expect(
+      readSettings({ connectFactor: "marked", connectFactorMinutes: 5 }),
+    ).toMatchObject({ connectFactor: "marked", connectFactorMinutes: 5 });
+    expect(
+      readSettings({ connectFactor: "nope", connectFactorMinutes: -1 }),
+    ).toMatchObject({ connectFactor: "off", connectFactorMinutes: 60 });
+  });
+});
+
+describe("connectFactorApplies", () => {
+  const on = { ...DEFAULT_SETTINGS, connectFactor: "all" as const };
+  const now = 10_000_000;
+
+  it("stays out of the way while off", () => {
+    expect(
+      connectFactorApplies(DEFAULT_SETTINGS, { interactive: true }, now),
+    ).toBe(false);
+  });
+
+  it("never stops background work", () => {
+    expect(connectFactorApplies(on, { interactive: false }, now)).toBe(false);
+  });
+
+  it("asks when the person has not verified, or it ran out", () => {
+    expect(connectFactorApplies(on, { interactive: true }, now)).toBe(true);
+    expect(
+      connectFactorApplies(
+        on,
+        { interactive: true, stepUpAt: now - 60 * 60_000 },
+        now,
+      ),
+    ).toBe(true);
+  });
+
+  it("lets a recent check through", () => {
+    expect(
+      connectFactorApplies(
+        on,
+        { interactive: true, stepUpAt: now - 59 * 60_000 },
+        now,
+      ),
+    ).toBe(false);
   });
 });
 
@@ -49,6 +97,7 @@ describe("decide", () => {
     expect(
       decide(
         {
+          ...DEFAULT_SETTINGS,
           idleTimeoutMinutes: 15,
           maxSessionHours: 8,
           rememberDevice: false,

@@ -35,6 +35,12 @@ Someone who has no second factor yet can still sign in, but sees a page that ask
 
 SSO and LDAP logins skip the rule unless you turn on Also for single sign-on. Leave it off when your identity provider already asks for a second factor.
 
+## Ask before connecting
+
+Ask for a second factor before connecting asks people for it when they open a terminal, remote desktop or file manager on a host. Pick Every host, or Hosts marked for it and turn on the switch in each host's editor.
+
+The connection stops with a Verify button that opens a tab for the code. Once it is entered, go back and connect again. Minutes before asking again sets how long that lasts, for every host that person connects to. Signing out ends it early. Each person verifies on their own. Metrics, tunnels and other background work are never asked. Someone with no second factor is told to set one up first.
+
 ## HTTPS
 
 To send plain HTTP to HTTPS, turn on Redirect HTTP to HTTPS in the Termix admin settings. It only works while Termix serves HTTPS itself. The Docker image already redirects when `ENABLE_SSL` is on.
