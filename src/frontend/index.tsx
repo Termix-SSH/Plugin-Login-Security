@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import type { TermixApp } from "@termix-ssh/plugin-sdk/frontend";
+import { getUserInfo } from "@termix-ssh/plugin-sdk/ui";
 import { ConnectVerifyTab } from "./ConnectVerifyTab";
 import { createSecurityOverlay } from "./SecurityOverlay";
 import { createFactorsStatus } from "./FactorsStatus";
@@ -24,9 +25,33 @@ export function activate(app: TermixApp): void {
   app.registerTab("sessions", SessionsKeysTab, {
     titleKey: "sessions.title",
     hostless: true,
+    singleton: true,
   });
   app.registerTab("admin-waits", AdminWaitsTab, {
     titleKey: "waits.title",
     hostless: true,
+    singleton: true,
+  });
+  app.registerPaletteEntry({
+    id: "sessions",
+    titleKey: "sessions.title",
+    keywords: ["sessions", "api keys", "sign out", "devices"],
+    scope: "global",
+    run: (shell) => shell.openSingletonTab("sessions"),
+  });
+  // Only admins can use the admin wait page.
+  let isAdmin = false;
+  void getUserInfo()
+    .then((info) => {
+      isAdmin = Boolean(info.is_admin);
+    })
+    .catch(() => {});
+  app.registerPaletteEntry({
+    id: "admin-waits",
+    titleKey: "waits.title",
+    keywords: ["admin", "wait", "hold", "two admins", "cooling off"],
+    scope: "global",
+    when: () => isAdmin,
+    run: (shell) => shell.openSingletonTab("admin-waits"),
   });
 }
