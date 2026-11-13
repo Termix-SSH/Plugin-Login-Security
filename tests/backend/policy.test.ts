@@ -39,6 +39,7 @@ describe("readSettings", () => {
       applyToExternal: true,
       connectFactor: "off",
       connectFactorMinutes: 60,
+      newDeviceNotice: true,
     });
   });
 

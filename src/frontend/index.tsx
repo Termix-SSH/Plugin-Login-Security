@@ -3,6 +3,8 @@ import type { TermixApp } from "@termix-ssh/plugin-sdk/frontend";
 import { ConnectVerifyTab } from "./ConnectVerifyTab";
 import { createSecurityOverlay } from "./SecurityOverlay";
 import { createFactorsStatus } from "./FactorsStatus";
+import { SessionsKeysTab } from "./SessionsKeysTab";
+import { AdminWaitsTab } from "./AdminWaitsTab";
 
 export function activate(app: TermixApp): void {
   if (app.guest) return;
@@ -17,6 +19,14 @@ export function activate(app: TermixApp): void {
   app.registerSettingsComponent("factors", createFactorsStatus(app));
   app.registerTab("connect-verify", ConnectVerifyTab, {
     titleKey: "verify.title",
+    hostless: true,
+  });
+  app.registerTab("sessions", SessionsKeysTab, {
+    titleKey: "sessions.title",
+    hostless: true,
+  });
+  app.registerTab("admin-waits", AdminWaitsTab, {
+    titleKey: "waits.title",
     hostless: true,
   });
 }

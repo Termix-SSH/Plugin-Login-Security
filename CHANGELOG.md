@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.2.0
+
+### Added
+
+- Sessions and keys: see your own sessions and API keys with when they were last used, sign out other sessions and revoke your keys. Admins can sign everyone out and revoke every API key at once
+- Admin wait: turn on the server's wait for dangerous admin changes, pick how long, and see or cancel what is waiting
+- An alert when someone signs in to your account from a device not seen before. Admins can turn it off for everyone and each person for themselves
+
+### Changed
+
+- Needs Termix 26.11.2 or newer
+
 ## 1.1.0
 
 ### Added
