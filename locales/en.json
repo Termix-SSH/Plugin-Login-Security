@@ -68,6 +68,7 @@
   "verify": {
     "title": "Verify second factor",
     "intro": "Enter your second factor to connect to this host.",
+    "start": "Verify",
     "done": "Verified",
     "retry": "Go back to the host and connect again.",
     "failed": "That did not work. Try again.",

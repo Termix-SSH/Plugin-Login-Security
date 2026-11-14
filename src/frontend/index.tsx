@@ -1,7 +1,7 @@
 import type { ComponentType } from "react";
 import type { TermixApp } from "@termix-ssh/plugin-sdk/frontend";
 import { getUserInfo } from "@termix-ssh/plugin-sdk/ui";
-import { ConnectVerifyTab } from "./ConnectVerifyTab";
+import { createConnectVerifyTab } from "./ConnectVerifyTab";
 import { createSecurityOverlay } from "./SecurityOverlay";
 import { createFactorsStatus } from "./FactorsStatus";
 import { SessionsKeysTab } from "./SessionsKeysTab";
@@ -18,7 +18,7 @@ export function activate(app: TermixApp): void {
     >,
   });
   app.registerSettingsComponent("factors", createFactorsStatus(app));
-  app.registerTab("connect-verify", ConnectVerifyTab, {
+  app.registerTab("connect-verify", createConnectVerifyTab(app), {
     titleKey: "verify.title",
     hostless: true,
   });

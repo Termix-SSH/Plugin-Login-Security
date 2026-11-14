@@ -12,6 +12,7 @@
 
 - Runs in its own process on Termix 26.11.2 and later, with no access to the server beyond what Termix allows it
 - Needs Termix 26.11.2 or newer
+- Connect verify asks for your second factor in a Termix prompt, so the code never passes through the plugin
 
 ## 1.1.0
 
