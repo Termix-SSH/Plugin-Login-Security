@@ -28,18 +28,20 @@
   "env": [],
   "engine": {
     "termix": ">=26.11.2-0",
-    "api": "^1.16"
+    "api": "^2.0.0"
   },
   "capabilities": [
     "auth:policy",
     "hosts:connect-policy",
-    "hosts:read",
     "network:serve",
     "ui:surface",
     "kv:own",
     "notify:send",
     "events:core"
   ],
+  "sandbox": {
+    "events": ["internal.event"]
+  },
   "contributes": {
     "tabs": [
       {
