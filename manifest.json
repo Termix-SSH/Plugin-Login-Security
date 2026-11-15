@@ -195,7 +195,8 @@
           "default": true
         }
       ]
-    }
+    },
+    "uses": ["auth.enrollment"]
   },
   "locales": "locales",
   "platforms": ["linux", "win32", "darwin"],
