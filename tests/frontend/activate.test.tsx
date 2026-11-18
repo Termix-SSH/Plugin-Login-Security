@@ -79,6 +79,12 @@ describe("login security frontend", () => {
       locales,
       api: calls as never,
     });
+    // The shell owns sign out from a frame (app.session).
+    const signOut = vi.fn(async () => {});
+    Object.assign(
+      (rendered.app as unknown as { session: Record<string, unknown> }).session,
+      { signOut },
+    );
     rendered.renderSlot("shell.overlay");
     await flush();
 
@@ -89,15 +95,14 @@ describe("login security frontend", () => {
     await act(async () => {
       vi.advanceTimersByTime(45_000);
     });
-    expect(ui.logoutUser).not.toHaveBeenCalled();
+    expect(signOut).not.toHaveBeenCalled();
     expect(calls.post).toHaveBeenCalledWith("/activity");
 
     await act(async () => {
       vi.advanceTimersByTime(75_000);
     });
     await flush();
-    expect(ui.logoutUser).toHaveBeenCalled();
-    expect(reload).toHaveBeenCalled();
+    expect(signOut).toHaveBeenCalled();
   });
 
   it("does nothing when the idle timeout is off", async () => {

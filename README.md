@@ -34,6 +34,10 @@ Read the [docs](https://docs.termix.site/plugins/login-security) to set it up an
 - Require a second factor at every login or on a new device
 - Works with any installed second factor, like an authenticator app or a security key
 - People without a second factor are asked to set one up before they can use Termix
+- See your own sessions and API keys with when they were last used, and end them
+- Admins can sign everyone out at once
+- Get an alert when someone signs in to your account from a new device
+- Optional admin wait: with two or more admins, dangerous changes wait so the others can cancel them
 
 <br />
 

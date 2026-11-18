@@ -95,6 +95,7 @@ describe("login security", () => {
 
   it("needs auth:policy", async () => {
     const mock = createMockCtx({
+      sandbox: true,
       pluginId: manifest.id,
       manifest,
       capabilities: ["network:serve", "ui:surface"],

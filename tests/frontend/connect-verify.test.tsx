@@ -14,6 +14,9 @@ vi.mock("@termix-ssh/plugin-sdk/frontend", () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 vi.mock("@termix-ssh/plugin-sdk/ui", () => ({
+  Button: (props: { children: unknown; onClick: () => void }) => (
+    <button onClick={props.onClick}>{props.children as never}</button>
+  ),
   LoadingState: () => <div>loading</div>,
   NoticePanel: (props: { title: string; children: unknown }) => (
     <div>
@@ -31,7 +34,11 @@ vi.mock("@termix-ssh/plugin-sdk/ui", () => ({
   verifyStepUp: ui.verify,
 }));
 
-import { ConnectVerifyTab } from "../../src/frontend/ConnectVerifyTab";
+import type { TabProps, TermixApp } from "@termix-ssh/plugin-sdk/frontend";
+import {
+  ConnectVerifyTab,
+  createConnectVerifyTab,
+} from "../../src/frontend/ConnectVerifyTab";
 
 beforeEach(() => {
   ui.factors = [];
@@ -50,5 +57,32 @@ describe("ConnectVerifyTab", () => {
     fireEvent.click(await screen.findByText("send code"));
     expect(await screen.findByText(/verify.done/)).toBeTruthy();
     expect(ui.verify).toHaveBeenCalledWith("totp", { code: "1" });
+  });
+});
+
+describe("shell step up", () => {
+  it("keeps the older flow on a core without it", () => {
+    expect(createConnectVerifyTab({} as TermixApp)).toBe(ConnectVerifyTab);
+  });
+
+  it("asks the shell and never draws a factor itself", async () => {
+    const stepUp = vi.fn(async () => true);
+    const Tab = createConnectVerifyTab({ stepUp } as unknown as TermixApp);
+    render(<Tab {...({} as TabProps)} />);
+    expect(screen.queryByText("send code")).toBeNull();
+    fireEvent.click(screen.getByText("verify.start"));
+    expect(await screen.findByText(/verify.done/)).toBeTruthy();
+    expect(stepUp).toHaveBeenCalledTimes(1);
+    expect(ui.verify).not.toHaveBeenCalled();
+  });
+
+  it("stays put when the person cancels", async () => {
+    const stepUp = vi.fn(async () => false);
+    const Tab = createConnectVerifyTab({ stepUp } as unknown as TermixApp);
+    render(<Tab {...({} as TabProps)} />);
+    fireEvent.click(screen.getByText("verify.start"));
+    await vi.waitFor(() => expect(stepUp).toHaveBeenCalled());
+    expect(screen.queryByText(/verify.done/)).toBeNull();
+    expect(screen.getByText("verify.start")).toBeTruthy();
   });
 });
